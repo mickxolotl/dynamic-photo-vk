@@ -21,7 +21,7 @@ class Target:
         if 'hash' in r.url:  # если 2fa включено
             if not remixttpid: raise Exception('No remixttpid')
             s.cookies.set('remixttpid', remixttpid, domain='.vk.com', path='/')
-            s.post('https://login.vk.com/', 'role=al_frame')
+            r = s.post('https://login.vk.com/', 'role=al_frame')
 
             if 'hash' in r.url:
                 raise Exception('Login failed')

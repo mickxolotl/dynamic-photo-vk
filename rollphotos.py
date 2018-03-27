@@ -23,9 +23,8 @@ if not profile or profile not in os.listdir('profiles'):
     raise Exception('No such profile')
 
 with open(os.path.join('profiles', profile)) as f:
-    p_settings = f.read().splitlines()
     photo_id, p_cookie, l_cookie, user_agent, *remixttpid = f.read().splitlines()
-    remixttpid = '' if not remixttpid else remixttpid[0]
+remixttpid = '' if not remixttpid else remixttpid[0]
 target = Target(p_cookie, l_cookie, user_agent, remixttpid)
 
 logging.log(logging.INFO, 'Profile loaded')

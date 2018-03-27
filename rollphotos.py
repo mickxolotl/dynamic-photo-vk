@@ -31,7 +31,7 @@ logging.log(logging.INFO, 'Profile loaded')
 
 
 def iter_photos(src):
-    photos = [os.path.join(src, x) for x in os.listdir(source)]
+    photos = [os.path.join(src, x) for x in os.listdir(source) if x != '.gitkeep']
 
     while True:
         shuffle(photos)

@@ -1,5 +1,6 @@
 # coding: utf-8
 import json
+import time
 import requests as req
 
 
@@ -69,7 +70,12 @@ class Target:
 
 
 def get_json(response):
-    return json.loads(response.split('<!json>')[1].split('<!>')[0])
+    try:
+        return json.loads(response.split('<!json>')[1].split('<!>')[0])
+    except IndexError:
+        with open('%s.dump' % int(time.time()), 'wt') as f:
+            f.write(response)
+        raise
 
 
 def upload_photo(path, server):

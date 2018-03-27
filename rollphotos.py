@@ -25,6 +25,7 @@ if not profile or profile not in os.listdir('profiles'):
 with open(os.path.join('profiles', profile)) as f:
     photo_id, p_cookie, l_cookie, user_agent, *remixttpid = f.read().splitlines()
 remixttpid = '' if not remixttpid else remixttpid[0]
+photo_id = photo_id if '_' not in photo_id else photo_id.split('_')[-1]
 target = Target(p_cookie, l_cookie, user_agent, remixttpid)
 
 logging.log(logging.INFO, 'Profile loaded')

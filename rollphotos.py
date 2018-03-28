@@ -46,7 +46,8 @@ logging.info('Looking for photos in %s' % source)
 
 
 def iter_photos(src):
-    photos = [os.path.join(src, x) for x in os.listdir(source) if x != '.gitkeep']
+    photos = [os.path.join(src, x) for x in os.listdir(src)
+              if x != '.gitkeep' and not os.path.isdir(os.path.join(src, x))]
 
     while True:
         shuffle(photos)

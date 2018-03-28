@@ -12,6 +12,12 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     filemode='at',
                     filename='dp_log.log',
                     level=logging.INFO)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(levelname)-8s [%(asctime)s]  %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+
 
 if len(sys.argv) > 1:
     profile = sys.argv[1]
@@ -33,6 +39,10 @@ photo_id = photo_id if '_' not in photo_id else photo_id.split('_')[-1]
 target = Target(p_cookie, l_cookie, user_agent, remixttpid)
 
 logging.log(logging.INFO, 'Profile loaded')
+
+if profile in os.listdir(source) and os.path.isdir(os.path.join(source, profile)):
+    source = os.path.join(source, profile)
+logging.info('Looking for photos in %s' % source)
 
 
 def iter_photos(src):

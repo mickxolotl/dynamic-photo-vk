@@ -1,6 +1,5 @@
 # coding: utf-8
 import json
-import time
 import logging
 import requests as req
 
@@ -29,7 +28,8 @@ class Target:
             if 'hash' in r.url:
                 raise Exception('Login failed')
         r = s.get('https://vk.com/edit')
-        assert 'login' not in r.url
+        if 'login' in r.url:
+            raise Exception('Login failed')
         logging.debug('auth check: %s' % r.url)
         # endregion
 
@@ -42,14 +42,10 @@ class Target:
             'act': 'show',
             'photo': photo_id,
             'al': 1,
-            'al_ad': 0,
-            'list': 'album%s_0 / rev' % self.id,
             'module': 'profile'
         }
         logging.debug('get_hash data: %s' % data)
-        sd = '&'.join('{}={}'.format(*x) for x in data.items())
-        logging.debug('serialized data: %s' % sd)
-        r = self.s.post('https://vk.com/al_photos.php', sd)
+        r = self.s.post('https://vk.com/al_photos.php', data)
         logging.debug('get_hash post:\n\turl: %s\n\trequest headers: %s\n\trequest body: %s\n\tresponse headers: %s' %
                       (r.url, {k: v for k, v in r.request.headers.items() if k != 'Cookie'}, r.request.body, r.headers))
         j = get_json(r.text)
@@ -84,10 +80,11 @@ def get_json(response):
     try:
         return json.loads(response.split('<!json>')[1].split('<!>')[0])
     except IndexError:
-        fname = '%s.dump' % int(time.time())
-        with open(fname, 'wt') as f:
-            f.write(response)
-        raise Exception('Dump file: %s' % fname)
+        raise Exception(response[:150])
+        # fname = '%s.dump' % int(time.time())
+        # with open(fname, 'wt') as f:
+        #     f.write(response)
+        # raise Exception('Dump file: %s' % fname)
 
 
 def upload_photo(path, server):

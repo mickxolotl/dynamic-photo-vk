@@ -11,7 +11,7 @@ source = 'photos'  # папка с фотками
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     filemode='at',
                     filename='dp_log.log',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
 if len(sys.argv) > 1:
     profile = sys.argv[1]
@@ -23,9 +23,13 @@ if not profile or profile not in os.listdir('profiles'):
     raise Exception('No such profile')
 
 with open(os.path.join('profiles', profile)) as f:
-    photo_id, p_cookie, l_cookie, user_agent, *remixttpid = f.read().splitlines()
+    text = f.read()
+    if text.startswith('\ufeff'):
+        text = text[1:]
+    photo_id, p_cookie, l_cookie, user_agent, *remixttpid = text.splitlines()
 remixttpid = '' if not remixttpid else remixttpid[0]
 photo_id = photo_id if '_' not in photo_id else photo_id.split('_')[-1]
+
 target = Target(p_cookie, l_cookie, user_agent, remixttpid)
 
 logging.log(logging.INFO, 'Profile loaded')

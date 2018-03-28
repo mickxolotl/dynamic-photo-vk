@@ -36,9 +36,11 @@ class Target:
         data = {
             'act': 'show',
             'photo': photo_id,
-            'open_pe': 1,
-            'pe_no_copy': 1,
+            # 'open_pe': 1,
+            # 'pe_no_copy': 1,
             'al': 1,
+            'al_ad': 0,
+            'list': 'album%s_0 / rev' % self.id,
             'module': 'profile'
         }
         j = get_json(self.s.post('https://vk.com/al_photos.php', data).text)
@@ -73,9 +75,10 @@ def get_json(response):
     try:
         return json.loads(response.split('<!json>')[1].split('<!>')[0])
     except IndexError:
-        with open('%s.dump' % int(time.time()), 'wt') as f:
+        fname = '%s.dump' % int(time.time())
+        with open(fname, 'wt') as f:
             f.write(response)
-        raise
+        raise Exception('Dump file: %s' % fname)
 
 
 def upload_photo(path, server):

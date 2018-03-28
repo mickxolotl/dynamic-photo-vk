@@ -43,8 +43,3 @@ ce0dde27d6c9d8dc8dfd63aaa50c0b5481d8b4ee8365f9861daa3
 Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36
 410f99b22cc22a38383aa777d33df6a6aaeee83ddd
 ```
-
-## Использование нескольких профилей:
-
-Для использования нескольких профилей можно создать в папке `photos` папку с тем же названием, что и у файла профиля из
-`profiles` и переместить фото в нее

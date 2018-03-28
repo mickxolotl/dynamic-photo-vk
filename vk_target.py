@@ -47,9 +47,11 @@ class Target:
             'module': 'profile'
         }
         logging.debug('get_hash data: %s' % data)
-        r = self.s.post('https://vk.com/al_photos.php', data)
+        sd = '&'.join('{}={}'.format(*x) for x in data.items())
+        logging.debug('serialized data: %s' % sd)
+        r = self.s.post('https://vk.com/al_photos.php', sd)
         logging.debug('get_hash post:\n\turl: %s\n\trequest headers: %s\n\trequest body: %s\n\tresponse headers: %s' %
-                      (r.url, {k:v for k,v in r.request.headers.items() if k != 'Cookie'}, r.request.body, r.headers))
+                      (r.url, {k: v for k, v in r.request.headers.items() if k != 'Cookie'}, r.request.body, r.headers))
         j = get_json(r.text)
         hs = [x['pe_hash'] for x in j if x['id'] == photo_id][0]
         return hs

@@ -1,12 +1,12 @@
 # coding: utf-8
 import json
 import time
+import logging
 import requests as req
 
 
 class Target:
-    def __init__(self, p_cookie, l_cookie, ua, remixttpid='', token=''):
-        self.token = token
+    def __init__(self, p_cookie, l_cookie, ua, remixttpid=''):
         self.p_cookie = p_cookie
         self.l_cookie = l_cookie
 
@@ -19,13 +19,18 @@ class Target:
         s.cookies.set('p', p_cookie, domain='.login.vk.com', path='/')
         s.cookies.set('l', l_cookie, domain='.login.vk.com', path='/')
         r = s.post('https://login.vk.com/', 'role=al_frame')
+        logging.debug('authorizing: %s' % r.url)
         if 'hash' in r.url:  # если 2fa включено
             if not remixttpid: raise Exception('No remixttpid')
             s.cookies.set('remixttpid', remixttpid, domain='.vk.com', path='/')
             r = s.post('https://login.vk.com/', 'role=al_frame')
+            logging.debug('authorizing(2fa): %s' % r.url)
 
             if 'hash' in r.url:
                 raise Exception('Login failed')
+        r = s.get('https://vk.com/edit')
+        assert 'login' not in r.url
+        logging.debug('auth check: %s' % r.url)
         # endregion
 
         self.id = l_cookie
@@ -36,14 +41,16 @@ class Target:
         data = {
             'act': 'show',
             'photo': photo_id,
-            # 'open_pe': 1,
-            # 'pe_no_copy': 1,
             'al': 1,
             'al_ad': 0,
             'list': 'album%s_0 / rev' % self.id,
             'module': 'profile'
         }
-        j = get_json(self.s.post('https://vk.com/al_photos.php', data).text)
+        logging.debug('get_hash data: %s' % data)
+        r = self.s.post('https://vk.com/al_photos.php', data)
+        logging.debug('get_hash post:\n\turl: %s\n\trequest headers: %s\n\trequest body: %s\n\tresponse headers: %s' %
+                      (r.url, {k:v for k,v in r.request.headers.items() if k != 'Cookie'}, r.request.body, r.headers))
+        j = get_json(r.text)
         hs = [x['pe_hash'] for x in j if x['id'] == photo_id][0]
         return hs
 

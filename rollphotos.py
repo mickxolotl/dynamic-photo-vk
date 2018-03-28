@@ -11,7 +11,7 @@ source = 'photos'  # папка с фотками
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     filemode='at',
                     filename='dp_log.log',
-                    level=logging.INFO)
+                    level=logging.DEBUG)
 
 if len(sys.argv) > 1:
     profile = sys.argv[1]

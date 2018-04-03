@@ -3,6 +3,8 @@ import json
 import logging
 import requests as req
 
+logging.getLogger("requests").setLevel(logging.WARNING)
+
 
 class Target:
     def __init__(self, p_cookie, l_cookie, ua, remixttpid=''):

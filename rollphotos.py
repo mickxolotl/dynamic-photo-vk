@@ -12,6 +12,7 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     filemode='at',
                     filename='dp_log.log',
                     level=logging.INFO)
+
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(levelname)-8s [%(asctime)s]  %(message)s')
@@ -48,6 +49,9 @@ logging.info('Looking for photos in %s' % source)
 def iter_photos(src):
     photos = [os.path.join(src, x) for x in os.listdir(src)
               if x != '.gitkeep' and not os.path.isdir(os.path.join(src, x))]
+    if not photos:
+        logging.error('No photos in %s' % src)
+        sys.exit(1)
 
     while True:
         shuffle(photos)
@@ -61,6 +65,13 @@ for photo in iter_photos(source):
         logging.log(logging.INFO, os.path.split(photo)[-1])
         if res:
             logging.error(res[0].text.strip()[:200])
-    except:
+    except KeyboardInterrupt:
+        logging.info('Exit')
+        sys.exit(0)
+    except Exception:
         logging.exception(photo)
-    time.sleep(4350)  # не чаще 20 раз в день
+    try:
+        time.sleep(4350)  # не чаще 20 раз в день
+    except KeyboardInterrupt:
+        logging.info('Exit')
+        sys.exit(0)

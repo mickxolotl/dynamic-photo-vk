@@ -8,10 +8,6 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 
 class Target:
     def __init__(self, p_cookie, l_cookie, ua, remixttpid=''):
-        self.p_cookie = p_cookie
-        self.l_cookie = l_cookie
-
-        # region LOGIN
         s = req.Session()
         s.headers['user-agent'] = ua
         s.headers['content-type'] = 'application/x-www-form-urlencoded'
@@ -20,20 +16,17 @@ class Target:
         s.cookies.set('p', p_cookie, domain='.login.vk.com', path='/')
         s.cookies.set('l', l_cookie, domain='.login.vk.com', path='/')
         r = s.post('https://login.vk.com/', 'role=al_frame')
-        logging.debug('authorizing: %s' % r.url)
         if 'hash' in r.url:  # если 2fa включено
-            if not remixttpid: raise Exception('No remixttpid')
+            if not remixttpid:
+                raise Exception('No remixttpid')
             s.cookies.set('remixttpid', remixttpid, domain='.vk.com', path='/')
             r = s.post('https://login.vk.com/', 'role=al_frame')
-            logging.debug('authorizing(2fa): %s' % r.url)
 
             if 'hash' in r.url:
                 raise Exception('Login failed')
         r = s.get('https://vk.com/edit')
         if 'login' in r.url:
             raise Exception('Login failed')
-        logging.debug('auth check: %s' % r.url)
-        # endregion
 
         self.id = l_cookie
         self.s = s
@@ -46,10 +39,7 @@ class Target:
             'al': 1,
             'module': 'profile'
         }
-        logging.debug('get_hash data: %s' % data)
         r = self.s.post('https://vk.com/al_photos.php', data)
-        logging.debug('get_hash post:\n\turl: %s\n\trequest headers: %s\n\trequest body: %s\n\tresponse headers: %s' %
-                      (r.url, {k: v for k, v in r.request.headers.items() if k != 'Cookie'}, r.request.body, r.headers))
         j = get_json(r.text)
         hs = [x['pe_hash'] for x in j if x['id'] == photo_id][0]
         return hs
@@ -59,8 +49,7 @@ class Target:
                 'photo_id': '%s_%s' % (self.id, pid),
                 'hash': self.get_hash(pid)}
         res = self.s.post('https://vk.com/al_photos.php', data)
-        j = get_json(res.text)
-        url = j['upload']['url']
+        url = get_json(res.text)['upload']['url']
 
         photo = upload_photo(path, url)
 
@@ -83,14 +72,10 @@ def get_json(response):
         return json.loads(response.split('<!json>')[1].split('<!>')[0])
     except IndexError:
         raise Exception(response[:150])
-        # fname = '%s.dump' % int(time.time())
-        # with open(fname, 'wt') as f:
-        #     f.write(response)
-        # raise Exception('Dump file: %s' % fname)
 
 
 def upload_photo(path, server):
-    if type(path) == str:
+    if isinstance(path, str):
         with open(path, 'rb') as f:
             r = req.post(server, files={'file0': ('edited_NaN.jpg', f)}).text
     else:

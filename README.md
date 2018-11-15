@@ -54,7 +54,7 @@ Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) 
 ```sh
 # git clone https://github.com/skorpionikus/dynamic-photo-vk && cd dynamic-photo-vk
 docker build -t dynamic-photo-vk .
-docker run -it --name dynamic-photo-vk \
+docker run -d --name dynamic-photo-vk \
     -v <path to photos directory>:/code/photos \
     -v <path to profiles directory>:/code/profiles  \
     dynamic-photo-vk python rollphotos.py my_profile

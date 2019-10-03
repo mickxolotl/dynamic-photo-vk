@@ -1,5 +1,4 @@
 # coding: utf-8
-import json
 import logging
 import requests as req
 
@@ -40,7 +39,7 @@ class Target:
             'module': 'profile'
         }
         r = self.s.post('https://vk.com/al_photos.php', data)
-        j = get_json(r.text)
+        j = r.json()['payload'][1][3]
         hs = [x['pe_hash'] for x in j if x['id'] == photo_id][0]
         return hs
 
@@ -49,7 +48,7 @@ class Target:
                 'photo_id': '%s_%s' % (self.id, pid),
                 'hash': self.get_hash(pid)}
         res = self.s.post('https://vk.com/al_photos.php', data)
-        url = get_json(res.text)['upload']['url']
+        url = res.json()['payload'][1][1]['upload']['url']
 
         photo = upload_photo(path, url)
 
@@ -65,13 +64,6 @@ class Target:
         if 'ошибка' in res.text.lower():
             print(res.text, photo, sep='\n\n', end='\n\n---\n\n')
             return res, photo
-
-
-def get_json(response):
-    try:
-        return json.loads(response.split('<!json>')[1].split('<!>')[0])
-    except IndexError:
-        raise Exception(response[:150])
 
 
 def upload_photo(path, server):
